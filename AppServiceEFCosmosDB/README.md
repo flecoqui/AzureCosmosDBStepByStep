@@ -1,16 +1,16 @@
 # Deployment of an ASP.Net Core Application running on Azure App Service using Azure Cosmos DB Service with CI/CD from a github repository  
 
-<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fflecoqui%2FAzureCosmosDBStepByStep%2Fmaster%2FAppServiceCosmosDB%2Fazuredeploy.json" target="_blank">
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fflecoqui%2FAzureCosmosDBStepByStep%2Fmaster%2FAppServiceEFCosmosDB%2Fazuredeploy.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
-<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fflecoqui%2FAzureCosmosDBStepByStep%2Fmaster%2FAppServiceCosmosDB%2Fazuredeploy.json" target="_blank">
+<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fflecoqui%2FAzureCosmosDBStepByStep%2Fmaster%2FAppServiceEFCosmosDB%2Fazuredeploy.json" target="_blank">
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
 This template allows you to deploy an ASP.Net Application on Azure App Service using Azure Cosmos DB Service. Moreover, this sample supports a VNET integration between the Web App, a SQL service and a Storage Account. For this deployment the source code of the ASP.Net  application will be stored on github and automatically deployed on Azure App Service.
 
 
-![](https://raw.githubusercontent.com/flecoqui/AzureCosmosDBStepByStep/master/AppServiceCosmosDB/Docs/1-architecture.png)
+![](https://raw.githubusercontent.com/flecoqui/AzureCosmosDBStepByStep/master/AppServiceEFCosmosDB/Docs/1-architecture.png)
 
 
 
