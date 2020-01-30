@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using AppServiceEFCosmosDB.DataService;
+using Microsoft.EntityFrameworkCore;
 
 namespace AppServiceEFCosmosDB
 {
@@ -16,6 +18,7 @@ namespace AppServiceEFCosmosDB
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            AppSettings.Initialize(configuration);
         }
 
         public IConfiguration Configuration { get; }
@@ -24,6 +27,12 @@ namespace AppServiceEFCosmosDB
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            string CosmosService = AppSettings.CosmosServiceName;
+            if (string.IsNullOrEmpty(CosmosService))
+                services.AddDbContext<CosmosDBContext>(options => options.UseInMemoryDatabase(databaseName: AppSettings.CosmosDatabaseName));
+            else
+                services.AddDbContext<CosmosDBContext>(options => options.UseCosmos(AppSettings.CosmosServiceName, AppSettings.CosmosServiceKey, AppSettings.CosmosDatabaseName));
+            services.AddTransient<CosmosDBService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,10 +50,11 @@ namespace AppServiceEFCosmosDB
             }
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthorization();
+
+
+
 
             app.UseEndpoints(endpoints =>
             {
