@@ -67,3 +67,33 @@ For instance:
 
     az group delete -n testwebcosmosapprg 
 
+
+
+## Building the application:
+
+1. install .Net Core SDK 3.1.101
+
+https://dotnet.microsoft.com/download/dotnet-core/3.1
+
+2. Check installation
+dotnet --list-sdks
+dotnet --version
+
+3. Create the directory
+mkdir AppServiceEFCosmosDB 
+cd AppServiceEFCosmosDB 
+
+4. Create the project
+dotnet new mvc
+
+5. Add EntityFrameworkCore package
+dotnet add package Microsoft.EntityFrameworkCore
+
+6. Build 
+dotnet build
+
+
+7. Run
+dotnet run
+
+open url https://localhost:5001/
