@@ -1,0 +1,388 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "namePrefix": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 50,
+      "metadata": {
+        "description": "Service name prefix must only contain lowercase letters, digits or dashes, cannot use dash as the first two or last one characters, cannot contain consecutive dashes, and is limited between 2 and 50 characters in length."
+      }
+    },
+    "webAppSku": {
+      "type": "string",
+      "defaultValue": "S1",
+      "allowedValues": [
+        "F1",
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1",
+        "P2",
+        "P3",
+        "P4"
+      ],
+      "metadata": {
+        "description": "The SKU of the Web service you want to create."
+      }
+    },
+    "repoURL": {
+      "type": "string",
+      "defaultValue": "https://github.com/flecoqui/AzureCosmosDBStepByStep.git",
+      "metadata": {
+        "description": "The URL for the GitHub repository that contains the project to deploy."
+      }
+    },
+    "repoBranch": {
+      "type": "string",
+      "defaultValue": "master",
+      "metadata": {
+        "description": "The branch of the GitHub repository to use."
+      }
+    },
+    "repoWebAppPath": {
+      "type": "string",
+      "defaultValue": "ASPNetCoreEFWebApp",
+      "metadata": {
+        "description": "The path of the Azure Web App on code on github."
+      }
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "databaseServiceName": "[concat(parameters('namePrefix'), 'cosmos')]",
+    "databaseName": "[concat(parameters('namePrefix'), 'db')]",
+    "webPlanName": "[concat(parameters('namePrefix'), 'webplan')]",
+    "webAppName": "[concat(parameters('namePrefix'), 'web')]",
+    "apiVersion": "2015-06-15",
+    "planSku": {
+      "y1": {
+        "name": "Y1",
+        "tier": "Dynamic",
+        "size": "Y1",
+        "family": "Y",
+        "capacity": 0,
+        "planKind": "linux",
+        "functionKind": "functionapp,linux",
+        "webKind": "app,linux"
+      },
+      "d1": {
+        "name": "D1",
+        "tier": "Shared",
+        "size": "D1",
+        "family": "D",
+        "capacity": 1,
+        "planKind": "linux",
+        "functionKind": "functionapp,linux,container",
+        "webKind": "app,linux"
+      },
+      "f1": {
+        "name": "F1",
+        "tier": "Free",
+        "size": "F1",
+        "family": "F",
+        "capacity": 1,
+        "planKind": "linux",
+        "functionKind": "functionapp,linux,container",
+        "webKind": "app,linux"
+      },
+      "b1": {
+        "name": "B1",
+        "tier": "Basic",
+        "size": "B1",
+        "family": "B",
+        "capacity": 1,
+        "planKind": "linux",
+        "functionKind": "functionapp,linux,container",
+        "webKind": "app,linux"
+      },
+      "s1": {
+        "name": "S1",
+        "tier": "Standard",
+        "size": "S1",
+        "family": "S",
+        "capacity": 1,
+        "planKind": "linux",
+        "functionKind": "functionapp,linux,container",
+        "webKind": "app,linux"
+      },
+      "p1": {
+        "name": "P1",
+        "tier": "Premium",
+        "size": "P1",
+        "family": "P",
+        "capacity": 1,
+        "planKind": "linux",
+        "functionKind": "functionapp,linux,container",
+        "webKind": "app,linux"
+      },
+      "p1v2": {
+        "name": "P1V2",
+        "tier": "PremiumV2",
+        "size": "P1V2",
+        "family": "PV2",
+        "capacity": 1,
+        "planKind": "linux",
+        "functionKind": "functionapp,linux,container",
+        "webKind": "app,linux"
+      },
+      "i1": {
+        "name": "I1",
+        "tier": "Isolated",
+        "size": "I1",
+        "family": "I",
+        "capacity": 1,
+        "planKind": "linux",
+        "functionKind": "functionapp,linux,container",
+        "webKind": "app,linux"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "apiVersion": "2019-08-01",
+      "name": "[variables('databaseServiceName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+      ],
+      "tags": {
+        "defaultExperience": "Core (SQL)"
+      },
+      "kind": "GlobalDocumentDB",
+      "properties": {
+        "ipRangeFilter": "104.42.195.92,40.76.54.131,52.176.6.30,52.169.50.45,52.187.184.26",
+        "enableAutomaticFailover": false,
+        "enableMultipleWriteLocations": false,
+        "isVirtualNetworkFilterEnabled": false,
+        "virtualNetworkRules": [
+        ],
+        "databaseAccountOfferType": "Standard",
+        "consistencyPolicy": {
+          "defaultConsistencyLevel": "Session",
+          "maxIntervalInSeconds": 5,
+          "maxStalenessPrefix": 100
+        },
+        "locations": [
+          {
+            "locationName": "[resourceGroup().location]",
+            "provisioningState": "Succeeded",
+            "failoverPriority": 0,
+            "isZoneRedundant": false
+          }
+        ],
+        "capabilities": []
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "sku": {
+        "name": "[variables('planSku')[toLower(parameters('webAppSku'))].name]",
+        "capacity": "[variables('planSku')[toLower(parameters('webAppSku'))].capacity]"
+      },
+      "kind": "[variables('planSku')[toLower(parameters('webAppSku'))].planKind]",
+      "name": "[variables('webPlanName')]",
+      "apiVersion": "2016-09-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "name": "[variables('webPlanName')]",
+        "perSiteScaling": false,
+        "reserved": true,
+        "targetWorkerCount": 0,
+        "targetWorkerSizeId": 0
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseServiceName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "kind": "[variables('planSku')[toLower(parameters('webAppSku'))].webKind]",
+      "name": "[variables('webAppName')]",
+      "apiVersion": "2016-08-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "enabled": true,
+        "name": "[variables('webAppName')]",
+        "hostNames": [
+          "[concat(variables('webAppName'),'.azurewebsites.net')]"
+        ],
+        "enabledHostNames": [
+          "[concat(variables('webAppName'),'.azurewebsites.net')]",
+          "[concat(variables('webAppName'),'.scm.azurewebsites.net')]"
+        ],
+        "hostNameSslStates": [
+          {
+            "name": "[concat(variables('webAppName'), '.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Standard"
+          },
+          {
+            "name": "[concat(variables('webAppName'), '.scm.azurewebsites.net')]",
+            "sslState": "Disabled",
+            "hostType": "Repository"
+          }
+        ],
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('webPlanName'))]",
+        "reserved": true,
+        "scmSiteAlsoStopped": false,
+        "clientAffinityEnabled": false,
+        "clientCertEnabled": false,
+        "hostNamesDisabled": false,
+        "containerSize": 0,
+        "dailyMemoryTimeQuota": 0,
+        "httpsOnly": true,
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "WEBSITE_DYNAMIC_CACHE",
+              "value": "0"
+            },
+            {
+              "name": "WEBSITE_LOCAL_CACHE_OPTION",
+              "value": "Never"
+            },
+            {
+              "name": "COSMOS_SERVICENAME",
+              "value": "[variables('databaseServiceName')]"
+            },
+            {
+              "name": "COSMOS_KEY",
+              "value": "[listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseServiceName')),'2019-08-01').primaryMasterKey]"
+            },
+            {
+              "name": "COSMOS_DATABASENAME",
+              "value": "[variables('databaseName')]"
+            }
+
+          ]
+        }
+      },
+      "resources": [
+
+      ],
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('webPlanName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('webAppName'), '/web')]",
+      "location":  "[resourceGroup().location]",
+      "dependsOn": [
+          "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
+      ],
+      "properties": {
+          "numberOfWorkers": 1,
+          "defaultDocuments": [
+              "Default.htm",
+              "Default.html",
+              "Default.asp",
+              "index.htm",
+              "index.html",
+              "iisstart.htm",
+              "default.aspx",
+              "index.php",
+              "hostingstart.html"
+          ],
+          "netFrameworkVersion": "v4.0",
+          "phpVersion": "",
+          "pythonVersion": "",
+          "nodeVersion": "",
+          "linuxFxVersion": "DOTNETCORE|3.1",
+          "requestTracingEnabled": false,
+          "remoteDebuggingEnabled": false,
+          "remoteDebuggingVersion": "VS2017",
+          "httpLoggingEnabled": false,
+          "logsDirectorySizeLimit": 35,
+          "detailedErrorLoggingEnabled": false,
+          "publishingUsername": "$testdotnetcore3wvd",
+         
+          "use32BitWorkerProcess": true,
+          "webSocketsEnabled": false,
+          "alwaysOn": true,
+          "appCommandLine": "",
+          "managedPipelineMode": "Integrated",
+          "virtualApplications": [
+              {
+                  "virtualPath": "/",
+                  "physicalPath": "site\\wwwroot",
+                  "preloadEnabled": true,
+                  "virtualDirectories": null
+              }
+          ],
+          "winAuthAdminState": 0,
+          "winAuthTenantState": 0,
+          "customAppPoolIdentityAdminState": false,
+          "customAppPoolIdentityTenantState": false,
+          "loadBalancing": "LeastRequests",
+          "routingRules": [],
+          "experiments": {
+              "rampUpRules": []
+          },
+          "autoHealEnabled": false,
+          "vnetName": "",
+          "siteAuthEnabled": false,
+          "siteAuthSettings": {
+              "enabled": null,
+              "unauthenticatedClientAction": null,
+              "tokenStoreEnabled": null,
+              "allowedExternalRedirectUrls": null,
+              "defaultProvider": null,
+              "clientId": null,
+              "clientSecret": null,
+              "clientSecretCertificateThumbprint": null,
+              "issuer": null,
+              "allowedAudiences": null,
+              "additionalLoginParams": null,
+              "isAadAutoProvisioned": false,
+              "googleClientId": null,
+              "googleClientSecret": null,
+              "googleOAuthScopes": null,
+              "facebookAppId": null,
+              "facebookAppSecret": null,
+              "facebookOAuthScopes": null,
+              "twitterConsumerKey": null,
+              "twitterConsumerSecret": null,
+              "microsoftAccountClientId": null,
+              "microsoftAccountClientSecret": null,
+              "microsoftAccountOAuthScopes": null
+          },
+          "localMySqlEnabled": false,
+          "http20Enabled": false,
+          "minTlsVersion": "1.2",
+          "ftpsState": "AllAllowed",
+          "reservedInstanceCount": 0,
+          "fileChangeAuditEnabled": false
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/hostNameBindings",
+      "apiVersion": "2016-08-01",
+      "name": "[concat(variables('webAppName'), '/', variables('webAppName'), '.azurewebsites.net')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
+      ],
+      "properties": {
+        "siteName": "[variables('webAppName')]",
+        "hostNameType": "Verified"
+      }
+    }
+  ],
+  "outputs": {
+    "AzureCosmos":{
+      "type": "string",
+      "value": "[concat('Cosmos Name: ',variables('databaseName'),' Key: ', listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseName')),'2019-08-01').primaryMasterKey)]"
+    },
+    "curlCmdAzWeb2": {
+      "type": "string",
+      "value": "[concat('curl -H \"Content-Type: application/json\"  -X GET   https://',variables('webAppName'),'.azurewebsites.net/')]"
+    }
+  }
+}
