@@ -7,8 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using AppServiceEFCosmosDB.DataService;
-namespace AppServiceEFCosmosDB
+using AppServiceCosmosDB.DataService;
+namespace AppServiceCosmosDB
 {
     public class Program
     {

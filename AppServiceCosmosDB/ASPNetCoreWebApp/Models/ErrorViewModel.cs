@@ -1,6 +1,6 @@
 using System;
 
-namespace AppServiceEFCosmosDB.Models
+namespace AppServiceCosmosDB.Models
 {
     public class ErrorViewModel
     {

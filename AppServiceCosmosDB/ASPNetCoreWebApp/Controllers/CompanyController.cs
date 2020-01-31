@@ -1,8 +1,8 @@
-﻿namespace AppServiceEFCosmosDB.Controllers
+﻿namespace AppServiceCosmosDB.Controllers
 {
     using System;
     using System.Threading.Tasks;
-    using AppServiceEFCosmosDB.DataService;
+    using AppServiceCosmosDB.DataService;
     using Microsoft.AspNetCore.Mvc;
     using Models;
 

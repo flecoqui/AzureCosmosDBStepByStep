@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppServiceEFCosmosDB", "AppServiceEFCosmosDB.csproj", "{80DA70F6-9A4F-4D5A-89B4-99E3B576377E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppServiceCosmosDB", "AppServiceCosmosDB.csproj", "{80DA70F6-9A4F-4D5A-89B4-99E3B576377E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

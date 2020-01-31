@@ -5,9 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using AppServiceEFCosmosDB.Models;
+using AppServiceCosmosDB.Models;
 
-namespace AppServiceEFCosmosDB.Controllers
+namespace AppServiceCosmosDB.Controllers
 {
     public class HomeController : Controller
     {

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
 
-namespace AppServiceEFCosmosDB.DataService
+
+namespace AppServiceCosmosDB.DataService
 {
-    public class CosmosDBContext : DbContext
+    public class CosmosDBContext 
     {
         public CosmosDBContext(DbContextOptions<CosmosDBContext> options)
             : base(options)
