@@ -72,7 +72,6 @@ For instance:
 ## Building the application AppServiceEFCosmosDB:
 
 1. Install .Net Core SDK 3.1.101</p>
-
 The SDK can be downloaded from there:</p> 
 https://dotnet.microsoft.com/download/dotnet-core/3.1
 
@@ -132,7 +131,6 @@ Enter the following commands with your operating system shell:
 
 5. Edit the configuration appsettings.json to specify the Cosmos DB service and configure the Cosmos DB service firewall to support your local IP address.
 
-</p>
         "COSMOS_SERVICENAME": "https://<cosmosdb>.documents.azure.com:443/",</p>
         "COSMOS_KEY": "",</p>
         "COSMOS_DATABASENAME": "testdb",</p>
