@@ -71,8 +71,9 @@ For instance:
 
 ## Building the application AppServiceEFCosmosDB:
 
-1. Install .Net Core SDK 3.1.101
-The SDK can be downloaded from there: 
+1. Install .Net Core SDK 3.1.101</p>
+
+The SDK can be downloaded from there:</p> 
 https://dotnet.microsoft.com/download/dotnet-core/3.1
 
 2. Check the installation
@@ -91,9 +92,9 @@ Enter the following commands with your operating system shell:
 
 5. Edit the configuration appsettings.json to specify the Cosmos DB service and configure the Cosmos DB service firewall to support your local IP address.
 
-    "COSMOS_SERVICENAME": "https://<cosmosdb>.documents.azure.com:443/",
-    "COSMOS_KEY": "",
-    "COSMOS_DATABASENAME": "testdb",
+        "COSMOS_SERVICENAME": "https://<cosmosdb>.documents.azure.com:443/",</p>
+        "COSMOS_KEY": "",</p>
+        "COSMOS_DATABASENAME": "testdb",</p>
 
 6. Build the project 
 
@@ -111,8 +112,8 @@ Enter the following commands with your operating system shell:
 
 ## Building the application AppServiceCosmosDB:
 
-1. Install .Net Core SDK 3.1.101
-The SDK can be downloaded from there: 
+1. Install .Net Core SDK 3.1.101</p>
+The SDK can be downloaded from there:</p> 
 https://dotnet.microsoft.com/download/dotnet-core/3.1
 
 2. Check the installation
@@ -131,10 +132,11 @@ Enter the following commands with your operating system shell:
 
 5. Edit the configuration appsettings.json to specify the Cosmos DB service and configure the Cosmos DB service firewall to support your local IP address.
 
-    "COSMOS_SERVICENAME": "https://<cosmosdb>.documents.azure.com:443/",
-    "COSMOS_KEY": "",
-    "COSMOS_DATABASENAME": "testdb",
-    "COSMOS_REGION": "East US 2",
+</p>
+        "COSMOS_SERVICENAME": "https://<cosmosdb>.documents.azure.com:443/",</p>
+        "COSMOS_KEY": "",</p>
+        "COSMOS_DATABASENAME": "testdb",</p>
+        "COSMOS_REGION": "East US 2",</p>
 
 6. Build the project 
 
