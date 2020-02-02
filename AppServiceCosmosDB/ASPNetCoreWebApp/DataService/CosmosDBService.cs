@@ -15,25 +15,78 @@ namespace AppServiceCosmosDB.DataService
     using Microsoft.Azure.Cosmos.Fluent;
     using Microsoft.Extensions.Configuration;
 
-    public class CosmosDbService : ICosmosDBService
+    public class CosmosDBService : ICosmosDBService
     {
-        private Container _container;
+        private const string _employeesContainerName = "Employees";
+        private const string _companiesContainerName = "Companies";
+        private string _cosmosDatabaseName;
+        private string _cosmosServiceName;
+        private string _cosmosServiceKey;
+        private string _cosmosRegion;
+        private Container _employees;
+        private Container _companies;
+        private CosmosClient _client;
+        private ILogger<CosmosDBService> _logger;
+        public CosmosDBService(
+            IConfiguration configuration,
+            ILogger<CosmosDBService> logger)
+        {
+            this._cosmosServiceName = configuration["COSMOS_SERVICENAME"] ?? ""; 
+            this._cosmosServiceKey = configuration["COSMOS_KEY"] ?? ""; 
+            this._cosmosDatabaseName = configuration["COSMOS_DATABASENAME"] ?? "testdb";
+            this._cosmosRegion = configuration["COSMOS_REGION"] ?? "East US2"; ;
 
-        public CosmosDbService(
-            CosmosClient dbClient,
-            string databaseName,
-            string containerName)
-        {
-            this._container = dbClient.GetContainer(databaseName, containerName);
-            
+            this._client = null;
+            this._employees = null;
+            this._companies = null;
+            InitializeCosmosClient();
+            _logger = logger;
         }
-        public async Task CreateTheDatabaseAsync()
+        public bool InitializeCosmosClient()
         {
-            var created = false;
+            bool result = false;
             try
             {
-                dbClient.CreateDatabaseIfNotExistsAsync
-                created = await _context.Database.EnsureCreatedAsync();
+                
+                CosmosClientBuilder clientBuilder = new CosmosClientBuilder(this._cosmosServiceName, this._cosmosServiceKey);
+                this._client = clientBuilder
+                                    .WithConnectionModeDirect()
+                                    .WithApplicationRegion(this._cosmosRegion)
+                                    .Build();
+                if (this._client != null)
+                {
+                    this._employees = this._client.GetContainer(this._cosmosDatabaseName, _employeesContainerName);
+                    this._companies = this._client.GetContainer(this._cosmosDatabaseName, _companiesContainerName);
+                    result = true;
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Exception while initializing the Cosmos DB Client : ", ex.Message);
+            }
+            return result;
+        }
+        public async Task<bool> CreateTheDatabaseAsync()
+        {
+            bool created = false;
+            try
+            {
+                if(this._client==null)
+                    InitializeCosmosClient();
+                DatabaseResponse databaseResponse = await _client.CreateDatabaseIfNotExistsAsync(_cosmosDatabaseName);
+                if (databaseResponse != null)
+                {
+                    ContainerResponse e =  await databaseResponse.Database.CreateContainerIfNotExistsAsync(_employeesContainerName, "/id");
+                    ContainerResponse c = await databaseResponse.Database.CreateContainerIfNotExistsAsync(_companiesContainerName, "/id");
+
+                    if (((c.StatusCode == System.Net.HttpStatusCode.Created) || (c.StatusCode == System.Net.HttpStatusCode.OK)) &&
+                        ((c.StatusCode == System.Net.HttpStatusCode.Created) || (c.StatusCode == System.Net.HttpStatusCode.OK)))
+                    {
+                        this._employees = this._client.GetContainer(this._cosmosDatabaseName, _employeesContainerName);
+                        this._companies = this._client.GetContainer(this._cosmosDatabaseName, _companiesContainerName);
+                        created = true;
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -48,15 +101,50 @@ namespace AppServiceCosmosDB.DataService
             {
                 Console.WriteLine("database already exists");
             }
+            return created;
+        }
+        async Task<ulong> GetCompaniesCount()
+        {
+            ulong result = 0;
+            string sqlQueryText = "SELECT VALUE COUNT(1) FROM c";
+            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
+            FeedIterator<ulong> queryResultSetIterator = this._companies.GetItemQueryIterator<ulong>(queryDefinition);
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<ulong> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+                foreach (ulong count in currentResultSet)
+                {
+                    result = count;
+                }
+            }
+            return result;
+        }
+        async Task<ulong> GetEmployeesCount()
+        {
+            ulong result = 0;
+            string sqlQueryText = "SELECT VALUE COUNT(1) FROM c";
+            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
+            FeedIterator<ulong> queryResultSetIterator = this._employees.GetItemQueryIterator<ulong>(queryDefinition);
+
+            while (queryResultSetIterator.HasMoreResults)
+            {
+                FeedResponse<ulong> currentResultSet = await queryResultSetIterator.ReadNextAsync();
+                foreach (ulong count in currentResultSet)
+                {
+                    result = count;
+                }
+            }
+            return result;
         }
         public async Task WriteTablesAsync()
 
         {
             try
             {
-                if (_context.Companies.LongCount() == 0)
+                if (await GetCompaniesCount() == 0)
                 {
-                    _context.Companies.AddRange(
+                    await AddCompanyAsync(
                                     new Company
                                     {
                                         id = Guid.NewGuid().ToString(),
@@ -66,7 +154,9 @@ namespace AppServiceCosmosDB.DataService
                                         zipCode = "29330",
                                         city = "Antananarivo",
                                         country = "Madagascar"
-                                    },
+                                    });
+                    
+                    await AddCompanyAsync(
                                     new Company
                                     {
                                         id = Guid.NewGuid().ToString(),
@@ -76,14 +166,13 @@ namespace AppServiceCosmosDB.DataService
                                         zipCode = "22330",
                                         city = "Bilbao",
                                         country = "Spain"
-                                    }); ;
-                    int changed = await _context.SaveChangesAsync();
-                    Console.WriteLine($"created Companies {changed} records");
+                                    }); 
+                    Console.WriteLine($"created Companies records");
                 }
-                if (_context.Employees.LongCount() == 0)
+                if (await GetEmployeesCount() == 0)
                 {
 
-                    _context.Employees.AddRange(
+                    await AddEmployeeAsync(
                                     new Employee
                                     {
                                         id = Guid.NewGuid().ToString(),
@@ -94,7 +183,9 @@ namespace AppServiceCosmosDB.DataService
                                         firstName = "John",
                                         lastName = "Belize",
                                         zipCode = "13098"
-                                    },
+                                    });
+
+                    await AddEmployeeAsync(
                                     new Employee
                                     {
                                         id = Guid.NewGuid().ToString(),
@@ -105,7 +196,8 @@ namespace AppServiceCosmosDB.DataService
                                         firstName = "Chris",
                                         lastName = "Cross",
                                         zipCode = "33098"
-                                    },
+                                    });
+                    await AddEmployeeAsync(
                                     new Employee
                                     {
                                         id = Guid.NewGuid().ToString(),
@@ -119,8 +211,7 @@ namespace AppServiceCosmosDB.DataService
                                     }
                                     );
 
-                    int changed = await _context.SaveChangesAsync();
-                    Console.WriteLine($"created Employees {changed} records");
+                    Console.WriteLine($"created Employees records");
                 }
             }
             catch (Exception ex)
@@ -129,59 +220,15 @@ namespace AppServiceCosmosDB.DataService
             }
 
         }
-        public async Task AddItemAsync(Item item)
-        {
-            await this._container.CreateItemAsync<Item>(item, new PartitionKey(item.Id));
-        }
 
-        public async Task DeleteItemAsync(string id)
-        {
-            await this._container.DeleteItemAsync<Item>(id, new PartitionKey(id));
-        }
-
-        public async Task<Item> GetItemAsync(string id)
-        {
-            try
-            {
-                ItemResponse<Item> response = await this._container.ReadItemAsync<Item>(id, new PartitionKey(id));
-                return response.Resource;
-            }
-            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                return null;
-            }
-
-        }
-
-        public async Task<IEnumerable<Item>> GetItemsAsync(string queryString)
-        {
-            var query = this._container.GetItemQueryIterator<Item>(new QueryDefinition(queryString));
-            List<Item> results = new List<Item>();
-            while (query.HasMoreResults)
-            {
-                var response = await query.ReadNextAsync();
-
-                results.AddRange(response.ToList());
-            }
-
-            return results;
-        }
-
-        public async Task UpdateItemAsync(string id, Item item)
-        {
-            await this._container.UpsertItemAsync<Item>(item, new PartitionKey(id));
-        }
-    }
 
 
 
         public async Task AddCompanyAsync(Company item)
         {
-            //await this._context.CreateCompanyAsync<Company>(item, new PartitionKey(item.Id));
             try
             {
-                await this._context.Companies.AddAsync(item);
-                await _context.SaveChangesAsync();
+                await this._companies.CreateItemAsync<Company>(item, new PartitionKey(item.id));
             }
             catch(Exception ex)
             {
@@ -191,15 +238,9 @@ namespace AppServiceCosmosDB.DataService
 
         public async Task DeleteCompanyAsync(string id)
         {
-            //await this._context.DeleteCompanyAsync<Company>(id, new PartitionKey(id));
-            Company c = await GetCompanyAsync(id);
             try
             {
-                if (c != null)
-                {
-                    this._context.Companies.Remove(c);
-                    await _context.SaveChangesAsync();
-                }
+                await this._companies.DeleteItemAsync<Company>(id, new PartitionKey(id));
             }
             catch (Exception ex)
             {
@@ -210,45 +251,34 @@ namespace AppServiceCosmosDB.DataService
 
         public async Task<Company> GetCompanyAsync(string id)
         {
-            //try
-            //{
-            //    CompanyResponse<Company> response = await this._context.ReadCompanyAsync<Company>(id, new PartitionKey(id));
-            //    return response.Resource;
-            //}
-            //catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-            //{
-            //    return null;
-            //}
             try
             {
-                return await this._context.Companies.FindAsync(id);
+                ItemResponse<Company> response = await this._companies.ReadItemAsync<Company>(id, new PartitionKey(id));
+                return response.Resource;
             }
-            catch(Exception ex)
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
-                _logger.LogError("Exception while finding a company: ", ex.Message);
+                  _logger.LogError("Exception while finding a company: ", ex.Message);
                 return null;
             }
 
         }
 
-        public IEnumerable<Company> GetCompaniesAsync()
+        public async Task<IEnumerable<Company>> GetCompaniesAsync()
         {
+            string queryString = "SELECT * FROM c";
             List<Company> results = new List<Company>();
-            //var query = this._context.Companies.GetCompanyQueryIterator<Company>(new QueryDefinition(queryString));
-            //while (query.HasMoreResults)
-            //{
-            //    var response = await query.ReadNextAsync();
-
-            //    results.AddRange(response.ToList());
-            //}
             try
             {
-                foreach (var c in this._context.Companies.ToList())
+                var query = this._companies.GetItemQueryIterator<Company>(new QueryDefinition(queryString));
+                while (query.HasMoreResults)
                 {
-                    results.Add(c);
+                    var response = await query.ReadNextAsync();
+
+                    results.AddRange(response.ToList());
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError("Exception while getting the list of company: ", ex.Message);
             }
@@ -259,25 +289,21 @@ namespace AppServiceCosmosDB.DataService
         {
             try
             {
-                _context.Companies.Update(item);
-                await _context.SaveChangesAsync();
+                await this._companies.UpsertItemAsync<Company>(item, new PartitionKey(item.id));
             }
             catch (Exception ex)
             {
                 _logger.LogError("Exception while updating a company: ", ex.Message);
             }
-
-            //await this._context.UpsertCompanyAsync<Company>(item, new PartitionKey(id));
         }
+
 
 
         public async Task AddEmployeeAsync(Employee item)
         {
-            //await this._context.CreateCompanyAsync<Company>(item, new PartitionKey(item.Id));
             try
             {
-                await this._context.Employees.AddAsync(item);
-                await _context.SaveChangesAsync();
+                await this._employees.CreateItemAsync<Employee>(item, new PartitionKey(item.id));
             }
             catch (Exception ex)
             {
@@ -287,15 +313,9 @@ namespace AppServiceCosmosDB.DataService
 
         public async Task DeleteEmployeeAsync(string id)
         {
-            //await this._context.DeleteCompanyAsync<Company>(id, new PartitionKey(id));
-            Employee c = await GetEmployeeAsync(id);
             try
             {
-                if (c != null)
-                {
-                    this._context.Employees.Remove(c);
-                    await _context.SaveChangesAsync();
-                }
+                await this._employees.DeleteItemAsync<Employee>(id, new PartitionKey(id));
             }
             catch (Exception ex)
             {
@@ -306,20 +326,12 @@ namespace AppServiceCosmosDB.DataService
 
         public async Task<Employee> GetEmployeeAsync(string id)
         {
-            //try
-            //{
-            //    CompanyResponse<Company> response = await this._context.ReadCompanyAsync<Company>(id, new PartitionKey(id));
-            //    return response.Resource;
-            //}
-            //catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-            //{
-            //    return null;
-            //}
             try
             {
-                return await this._context.Employees.FindAsync(id);
+                ItemResponse<Employee> response = await this._employees.ReadItemAsync<Employee>(id, new PartitionKey(id));
+                return response.Resource;
             }
-            catch (Exception ex)
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 _logger.LogError("Exception while finding a company: ", ex.Message);
                 return null;
@@ -327,21 +339,18 @@ namespace AppServiceCosmosDB.DataService
 
         }
 
-        public IEnumerable<Employee> GetEmployeesAsync()
+        public async Task<IEnumerable<Employee>> GetEmployeesAsync()
         {
+            string queryString = "SELECT * FROM c";
             List<Employee> results = new List<Employee>();
-            //var query = this._context.Companies.GetEmployeeQueryIterator<Company>(new QueryDefinition(queryString));
-            //while (query.HasMoreResults)
-            //{
-            //    var response = await query.ReadNextAsync();
-
-            //    results.AddRange(response.ToList());
-            //}
             try
             {
-                foreach (var c in this._context.Employees.ToList())
+                var query = this._employees.GetItemQueryIterator<Employee>(new QueryDefinition(queryString));
+                while (query.HasMoreResults)
                 {
-                    results.Add(c);
+                    var response = await query.ReadNextAsync();
+
+                    results.AddRange(response.ToList());
                 }
             }
             catch (Exception ex)
@@ -355,15 +364,13 @@ namespace AppServiceCosmosDB.DataService
         {
             try
             {
-                _context.Employees.Update(item);
-                await _context.SaveChangesAsync();
+                await this._employees.UpsertItemAsync<Employee>(item, new PartitionKey(item.id));
             }
             catch (Exception ex)
             {
                 _logger.LogError("Exception while updating a company: ", ex.Message);
             }
-
-            //await this._context.UpsertCompanyAsync<Company>(item, new PartitionKey(id));
         }
+
     }
 }

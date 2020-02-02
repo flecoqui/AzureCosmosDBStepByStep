@@ -1,6 +1,7 @@
 ﻿namespace AppServiceCosmosDB.Controllers
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using AppServiceCosmosDB.DataService;
     using Microsoft.AspNetCore.Mvc;
@@ -15,9 +16,10 @@
         }
 
         [ActionName("Index")]
-        public  IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_cosmosDbService.GetCompaniesAsync());
+            IEnumerable<Company> list = await _cosmosDbService.GetCompaniesAsync();
+            return View(list);
         }
 
         [ActionName("Create")]

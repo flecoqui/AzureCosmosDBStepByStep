@@ -15,9 +15,9 @@
         }
 
         [ActionName("Index")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_cosmosDbService.GetEmployeesAsync());
+            return View(await _cosmosDbService.GetEmployeesAsync());
         }
 
         [ActionName("Create")]

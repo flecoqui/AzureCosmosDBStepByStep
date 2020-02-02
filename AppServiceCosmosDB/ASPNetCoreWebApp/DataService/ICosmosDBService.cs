@@ -14,15 +14,15 @@ namespace AppServiceCosmosDB.DataService
 
     public interface ICosmosDBService
     {
-        Task<IEnumerable<Employee>> GetEmployeesAsync(string query);
+        Task<IEnumerable<Employee>> GetEmployeesAsync();
         Task<Employee> GetEmployeeAsync(string id);
         Task AddEmployeeAsync(Employee item);
-        Task UpdateEmployeeAsync(string id, Employee item);
+        Task UpdateEmployeeAsync(Employee item);
         Task DeleteEmployeeAsync(string id);
-        Task<IEnumerable<Company>> GetCompaniesAsync(string query);
+        Task<IEnumerable<Company>> GetCompaniesAsync();
         Task<Company> GetCompanyAsync(string id);
         Task AddCompanyAsync(Company item);
-        Task UpdateCompanyAsync(string id, Company item);
+        Task UpdateCompanyAsync(Company item);
         Task DeleteCompanyAsync(string id);
     }
 }

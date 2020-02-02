@@ -257,8 +257,11 @@
             {
               "name": "COSMOS_DATABASENAME",
               "value": "[variables('databaseName')]"
+            },
+            {
+              "name": "COSMOS_REGION",
+              "value": "[resourceGroup().location]"
             }
-
           ]
         }
       },
@@ -378,7 +381,7 @@
   "outputs": {
     "AzureCosmos":{
       "type": "string",
-      "value": "[concat('Cosmos Name: ',variables('databaseName'),' Key: ', listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseName')),'2019-08-01').primaryMasterKey)]"
+      "value": "[concat('Cosmos Name: ',variables('databaseServiceName'),' Key: ', listKeys(resourceId('Microsoft.DocumentDB/databaseAccounts', variables('databaseServiceName')),'2019-08-01').primaryMasterKey)]"
     },
     "curlCmdAzWeb2": {
       "type": "string",

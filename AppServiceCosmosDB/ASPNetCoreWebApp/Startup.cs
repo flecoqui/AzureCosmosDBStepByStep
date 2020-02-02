@@ -10,6 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using AppServiceCosmosDB.DataService;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+
 namespace AppServiceCosmosDB
 {
     public class Startup
@@ -32,13 +34,8 @@ namespace AppServiceCosmosDB
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddControllersWithViews();
-            string CosmosService = AppSettings.CosmosServiceName;
-            if (string.IsNullOrEmpty(CosmosService))
-                services.AddDbContext<CosmosDBContext>(options => options.UseInMemoryDatabase(databaseName: AppSettings.CosmosDatabaseName));
-            else
-                services.AddDbContext<CosmosDBContext>(options => options.UseCosmos(AppSettings.CosmosServiceName, AppSettings.CosmosServiceKey, AppSettings.CosmosDatabaseName));
-            services.AddTransient<CosmosDBService>();
+            services.AddControllersWithViews();            
+            services.AddSingleton<CosmosDBService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
