@@ -1,11 +1,11 @@
-﻿using AppServiceCosmosDB.Models;
+﻿using AppServiceSingleCosmosDB.Models;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AppServiceCosmosDB.DataService
+namespace AppServiceSingleCosmosDB.DataService
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -17,7 +17,7 @@ namespace AppServiceCosmosDB.DataService
 
     public class CosmosDBService : ICosmosDBService
     {
-        private const string _employeesContainerName = "Employees";
+        private const string _employeesContainerName = "persondata";
         private const string _companiesContainerName = "Companies";
         private string _cosmosDatabaseName;
         private string _cosmosServiceName;
@@ -33,7 +33,7 @@ namespace AppServiceCosmosDB.DataService
         {
             this._cosmosServiceName = configuration["COSMOS_SERVICENAME"] ?? ""; 
             this._cosmosServiceKey = configuration["COSMOS_KEY"] ?? ""; 
-            this._cosmosDatabaseName = configuration["COSMOS_DATABASENAME"] ?? "testdb";
+            this._cosmosDatabaseName = configuration["COSMOS_DATABASENAME"] ?? "eadatabase";
             this._cosmosRegion = configuration["COSMOS_REGION"] ?? "East US2"; ;
 
             this._client = null;
@@ -77,13 +77,13 @@ namespace AppServiceCosmosDB.DataService
                 if (databaseResponse != null)
                 {
                     ContainerResponse e =  await databaseResponse.Database.CreateContainerIfNotExistsAsync(_employeesContainerName, "/id");
-                    ContainerResponse c = await databaseResponse.Database.CreateContainerIfNotExistsAsync(_companiesContainerName, "/id");
+                //    ContainerResponse c = await databaseResponse.Database.CreateContainerIfNotExistsAsync(_companiesContainerName, "/id");
 
-                    if (((c.StatusCode == System.Net.HttpStatusCode.Created) || (c.StatusCode == System.Net.HttpStatusCode.OK)) &&
-                        ((c.StatusCode == System.Net.HttpStatusCode.Created) || (c.StatusCode == System.Net.HttpStatusCode.OK)))
+                    if ((e.StatusCode == System.Net.HttpStatusCode.Created) || (e.StatusCode == System.Net.HttpStatusCode.OK))/* &&
+                        ((c.StatusCode == System.Net.HttpStatusCode.Created) || (c.StatusCode == System.Net.HttpStatusCode.OK)))*/
                     {
                         this._employees = this._client.GetContainer(this._cosmosDatabaseName, _employeesContainerName);
-                        this._companies = this._client.GetContainer(this._cosmosDatabaseName, _companiesContainerName);
+                     //   this._companies = this._client.GetContainer(this._cosmosDatabaseName, _companiesContainerName);
                         created = true;
                     }
                 }
@@ -142,6 +142,7 @@ namespace AppServiceCosmosDB.DataService
         {
             try
             {
+                /*
                 if (await GetCompaniesCount() == 0)
                 {
                     await AddCompanyAsync(
@@ -213,6 +214,7 @@ namespace AppServiceCosmosDB.DataService
 
                     Console.WriteLine($"created Employees records");
                 }
+                */
             }
             catch (Exception ex)
             {
