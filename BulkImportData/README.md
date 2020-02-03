@@ -1,4 +1,4 @@
-# Sample .NET CosmosDB Bulk Import Application used to optimize the CosmosDB provisioned throughput (RU/s
+# Sample .NET CosmosDB Bulk Import Application used to optimize the CosmosDB provisioned throughput (RU/s)
 
 
 ## Building the application BulkImportData:
