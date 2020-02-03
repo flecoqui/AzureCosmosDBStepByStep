@@ -6,10 +6,11 @@ Overview
 This repository contains several ARM Templates to deploy Azure Cosmos DB services and  sample Applications using Azure Cosmos DB services.
 
 
-- [**Cosmos DB ARM Template**](https://github.com/flecoqui/AzureCosmosDBStepByStep/tree/master/AppServiceCosmosDB): ARM Template to deploy an Azure Cosmos DB services and an Azure App Service. 
+- [**Cosmos DB ARM Template**](https://github.com/flecoqui/AzureCosmosDBStepByStep/tree/master/Azure/101-appservice-cosmos): ARM Template to deploy an Azure Cosmos DB services and an Azure App Service. 
 
-- [**ASP.NET Core Entity Framework Cosmos DB Sample Application**](https://github.com/flecoqui/AzureCosmosDBStepByStep/tree/master/AppServiceCosmosDB/ASPNetCoreEFWebApp): Sample ASP.NET Core application based on Entity Framework using Cosmos DB services.
+- [**ASP.NET Core Entity Framework Cosmos DB Sample Application**](https://github.com/flecoqui/AzureCosmosDBStepByStep/tree/master/ASPNetCoreEFWebApp): Sample ASP.NET Core application based on Entity Framework using Cosmos DB services.
 
-- [**ASP.NET Core .Net Cosmos SDK  Sample Application**](https://github.com/flecoqui/AzureCosmosDBStepByStep/tree/master/AppServiceCosmosDB/ASPNetCoreWebApp): Sample ASP.NET Core application based on Cosmos DB .Net SDK using Cosmos DB services.
+- [**ASP.NET Core .Net Cosmos SDK  Sample Application**](https://github.com/flecoqui/AzureCosmosDBStepByStep/tree/master/ASPNetCoreWebApp): Sample ASP.NET Core application based on Cosmos DB .Net SDK using Cosmos DB services.
 
+- [**ASP.NET Core .Net Cosmos SDK Sample Application with single container**](https://github.com/flecoqui/AzureCosmosDBStepByStep/tree/master/ASPNetCoreSingleWebApp): Sample ASP.NET Core application based on Cosmos DB .Net SDK using Cosmos DB services with single container.
 
