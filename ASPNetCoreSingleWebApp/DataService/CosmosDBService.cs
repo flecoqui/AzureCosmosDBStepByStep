@@ -96,23 +96,7 @@ namespace AppServiceSingleCosmosDB.DataService
             }
             return created;
         }
-        async Task<ulong> GetCompaniesCount()
-        {
-            ulong result = 0;
-            string sqlQueryText = "SELECT VALUE COUNT(1) FROM c";
-            QueryDefinition queryDefinition = new QueryDefinition(sqlQueryText);
-            FeedIterator<ulong> queryResultSetIterator = this._companies.GetItemQueryIterator<ulong>(queryDefinition);
 
-            while (queryResultSetIterator.HasMoreResults)
-            {
-                FeedResponse<ulong> currentResultSet = await queryResultSetIterator.ReadNextAsync();
-                foreach (ulong count in currentResultSet)
-                {
-                    result = count;
-                }
-            }
-            return result;
-        }
         async Task<ulong> GetEmployeesCount()
         {
             ulong result = 0;
@@ -135,7 +119,11 @@ namespace AppServiceSingleCosmosDB.DataService
         {
             try
             {
+                if (await GetEmployeesCount() == 0)
+                {
 
+
+                }
             }
             catch (Exception ex)
             {
