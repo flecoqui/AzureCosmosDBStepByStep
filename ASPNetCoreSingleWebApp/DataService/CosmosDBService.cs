@@ -24,7 +24,6 @@ namespace AppServiceSingleCosmosDB.DataService
         private string _cosmosServiceKey;
         private string _cosmosRegion;
         private Container _employees;
-        private Container _companies;
         private CosmosClient _client;
         private ILogger<CosmosDBService> _logger;
         public CosmosDBService(
@@ -38,7 +37,6 @@ namespace AppServiceSingleCosmosDB.DataService
 
             this._client = null;
             this._employees = null;
-            this._companies = null;
             InitializeCosmosClient();
             _logger = logger;
         }
@@ -56,7 +54,6 @@ namespace AppServiceSingleCosmosDB.DataService
                 if (this._client != null)
                 {
                     this._employees = this._client.GetContainer(this._cosmosDatabaseName, _employeesContainerName);
-                    this._companies = this._client.GetContainer(this._cosmosDatabaseName, _companiesContainerName);
                     result = true;
                 }
             }
@@ -77,13 +74,9 @@ namespace AppServiceSingleCosmosDB.DataService
                 if (databaseResponse != null)
                 {
                     ContainerResponse e =  await databaseResponse.Database.CreateContainerIfNotExistsAsync(_employeesContainerName, "/id");
-                //    ContainerResponse c = await databaseResponse.Database.CreateContainerIfNotExistsAsync(_companiesContainerName, "/id");
-
-                    if ((e.StatusCode == System.Net.HttpStatusCode.Created) || (e.StatusCode == System.Net.HttpStatusCode.OK))/* &&
-                        ((c.StatusCode == System.Net.HttpStatusCode.Created) || (c.StatusCode == System.Net.HttpStatusCode.OK)))*/
+                    if ((e.StatusCode == System.Net.HttpStatusCode.Created) || (e.StatusCode == System.Net.HttpStatusCode.OK))
                     {
                         this._employees = this._client.GetContainer(this._cosmosDatabaseName, _employeesContainerName);
-                     //   this._companies = this._client.GetContainer(this._cosmosDatabaseName, _companiesContainerName);
                         created = true;
                     }
                 }
@@ -142,79 +135,7 @@ namespace AppServiceSingleCosmosDB.DataService
         {
             try
             {
-                /*
-                if (await GetCompaniesCount() == 0)
-                {
-                    await AddCompanyAsync(
-                                    new Company
-                                    {
-                                        id = Guid.NewGuid().ToString(),
-                                        companyId = 1,
-                                        name = "MotherCompany",
-                                        address = "One Mother Company Way",
-                                        zipCode = "29330",
-                                        city = "Antananarivo",
-                                        country = "Madagascar"
-                                    });
-                    
-                    await AddCompanyAsync(
-                                    new Company
-                                    {
-                                        id = Guid.NewGuid().ToString(),
-                                        companyId = 2,
-                                        name = "FirstCompany",
-                                        address = "One First Company Way",
-                                        zipCode = "22330",
-                                        city = "Bilbao",
-                                        country = "Spain"
-                                    }); 
-                    Console.WriteLine($"created Companies records");
-                }
-                if (await GetEmployeesCount() == 0)
-                {
 
-                    await AddEmployeeAsync(
-                                    new Employee
-                                    {
-                                        id = Guid.NewGuid().ToString(),
-                                        address = "1 Seashore street",
-                                        city = "Santa Cruz",
-                                        country = "USA",
-                                        employeeId = 1,
-                                        firstName = "John",
-                                        lastName = "Belize",
-                                        zipCode = "13098"
-                                    });
-
-                    await AddEmployeeAsync(
-                                    new Employee
-                                    {
-                                        id = Guid.NewGuid().ToString(),
-                                        address = "1 Mountain street",
-                                        city = "Salt Lake City",
-                                        country = "USA",
-                                        employeeId = 2,
-                                        firstName = "Chris",
-                                        lastName = "Cross",
-                                        zipCode = "33098"
-                                    });
-                    await AddEmployeeAsync(
-                                    new Employee
-                                    {
-                                        id = Guid.NewGuid().ToString(),
-                                        address = "2 Field Mice street",
-                                        city = "Baltimore",
-                                        country = "USA",
-                                        employeeId = 3,
-                                        firstName = "Eve",
-                                        lastName = "Mortadella",
-                                        zipCode = "45678"
-                                    }
-                                    );
-
-                    Console.WriteLine($"created Employees records");
-                }
-                */
             }
             catch (Exception ex)
             {
@@ -224,80 +145,6 @@ namespace AppServiceSingleCosmosDB.DataService
         }
 
 
-
-
-        public async Task AddCompanyAsync(Company item)
-        {
-            try
-            {
-                await this._companies.CreateItemAsync<Company>(item, new PartitionKey(item.id));
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError("Exception while adding a company: ", ex.Message);
-            }
-        }
-
-        public async Task DeleteCompanyAsync(string id)
-        {
-            try
-            {
-                await this._companies.DeleteItemAsync<Company>(id, new PartitionKey(id));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Exception while removing a company: ", ex.Message);
-            }
-
-        }
-
-        public async Task<Company> GetCompanyAsync(string id)
-        {
-            try
-            {
-                ItemResponse<Company> response = await this._companies.ReadItemAsync<Company>(id, new PartitionKey(id));
-                return response.Resource;
-            }
-            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                  _logger.LogError("Exception while finding a company: ", ex.Message);
-                return null;
-            }
-
-        }
-
-        public async Task<IEnumerable<Company>> GetCompaniesAsync()
-        {
-            string queryString = "SELECT * FROM c";
-            List<Company> results = new List<Company>();
-            try
-            {
-                var query = this._companies.GetItemQueryIterator<Company>(new QueryDefinition(queryString));
-                while (query.HasMoreResults)
-                {
-                    var response = await query.ReadNextAsync();
-
-                    results.AddRange(response.ToList());
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Exception while getting the list of company: ", ex.Message);
-            }
-            return results;
-        }
-
-        public async Task UpdateCompanyAsync(Company item)
-        {
-            try
-            {
-                await this._companies.UpsertItemAsync<Company>(item, new PartitionKey(item.id));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Exception while updating a company: ", ex.Message);
-            }
-        }
 
 
 
