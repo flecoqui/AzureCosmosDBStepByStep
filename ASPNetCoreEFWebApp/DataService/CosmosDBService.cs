@@ -30,7 +30,6 @@ namespace AppServiceEFCosmosDB.DataService
             catch (Exception ex)
             {
                 Console.WriteLine("database exception : " + ex.Message);
-
             }
             if (created)
             {

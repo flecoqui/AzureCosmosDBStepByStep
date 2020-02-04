@@ -1,4 +1,4 @@
-# Deployment of an ASP.Net Core Application running on Azure App Service using Azure Cosmos DB Service with CI/CD from a github repository  
+# Deployment of an ASP.Net Core Application running on Azure App Service using Azure Cosmos DB Service 
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fflecoqui%2FAzureCosmosDBStepByStep%2Fmaster%2FAzure%2F101-appservice-cosmos%2Fazuredeploy.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
@@ -7,11 +7,13 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
-This template allows you to deploy an ASP.Net Application on Azure App Service using Azure Cosmos DB Service. Moreover, this sample supports a VNET integration between the Web App, a SQL service and a Storage Account. For this deployment the source code of the ASP.Net  application will be stored on github and automatically deployed on Azure App Service.
-
+This template allows you to deploy an ASP.Net Application on Azure App Service using Azure Cosmos DB Service. For this deployment the source code of the ASP.Net  application will be stored on github and automatically deployed on Azure App Service.
+Currently this scenario is not supported with ASP.Net Core applications based on .Net Core SDK 3.1, it works for applications based on .Net Core SDK 3.0.
+The Oryx build running on Azure which automatically deploys the source code stored on gituhb towards Azure App Services doesn't support .Net Core SDK 3.1.
+See issue there:</p>
+https://github.com/microsoft/Oryx/issues/473 
 
 ![](https://raw.githubusercontent.com/flecoqui/AzureCosmosDBStepByStep/master/Azure/101-appservice-cosmos/Docs/1-architecture.png)
-
 
 
 ## CREATE RESOURCE GROUP:
