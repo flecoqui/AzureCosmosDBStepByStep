@@ -129,7 +129,7 @@
 
                 // Create with a throughput of 50000 RU/s
                 // Indexing Policy to exclude all attributes to maximize RU/s usage
-                Console.WriteLine("This tutorial will create a 50000 RU/s container, press any key to continue.");
+                Console.WriteLine("This sample app will create a 50000 RU/s container, press any key to continue.");
                 Console.ReadKey();
 
 
@@ -210,6 +210,8 @@
 
                 finally
                 {
+                    Console.WriteLine("This sample app will delete the database, press any key to continue.");
+                    Console.ReadKey();
                     Console.WriteLine("Cleaning up resources...");
                     await database.DeleteAsync();
                 }
