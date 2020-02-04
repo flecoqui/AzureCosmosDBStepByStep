@@ -26,6 +26,82 @@ namespace AppServiceSingleCosmosDB.DataService
         private Container _employees;
         private CosmosClient _client;
         private ILogger<CosmosDBService> _logger;
+
+        private string[] regionArray = {
+                Regions.WestUS,
+                Regions.UKSouth,
+                Regions.BrazilSouth,
+                Regions.USGovArizona,
+                Regions.USGovTexas,
+                Regions.USGovVirginia,
+                Regions.EastUS2EUAP,
+                Regions.CentralUSEUAP,
+                Regions.FranceCentral,
+                Regions.FranceSouth,
+                Regions.USDoDCentral,
+                Regions.USDoDEast,
+                Regions.AustraliaCentral,
+                Regions.AustraliaCentral2,
+                Regions.SouthAfricaNorth,
+                Regions.SouthAfricaWest,
+                Regions.UAECentral,
+                Regions.UAENorth,
+                Regions.USNatEast,
+                Regions.USNatWest,
+                Regions.USSecEast,
+                Regions.USSecWest,
+                Regions.SwitzerlandNorth,
+                Regions.SwitzerlandWest,
+                Regions.GermanyNorth,
+                Regions.GermanyWestCentral,
+                Regions.UKWest,
+                Regions.NorwayEast,
+                Regions.KoreaCentral,
+                Regions.ChinaEast2,
+                Regions.WestUS2,
+                Regions.WestCentralUS,
+                Regions.EastUS,
+                Regions.EastUS2,
+                Regions.CentralUS,
+                Regions.SouthCentralUS,
+                Regions.NorthCentralUS,
+                Regions.WestEurope,
+                Regions.NorthEurope,
+                Regions.EastAsia,
+                Regions.SoutheastAsia,
+                Regions.JapanEast,
+                Regions.JapanWest,
+                Regions.AustraliaEast,
+                Regions.AustraliaSoutheast,
+                Regions.CentralIndia,
+                Regions.SouthIndia,
+                Regions.WestIndia,
+                Regions.CanadaEast,
+                Regions.CanadaCentral,
+                Regions.GermanyCentral,
+                Regions.GermanyNortheast,
+                Regions.ChinaNorth,
+                Regions.ChinaEast,
+                Regions.ChinaNorth2,
+                Regions.KoreaSouth,
+                Regions.NorwayWest
+            };
+        public string GetCosmosRegion(string region)
+        {
+            foreach (string s in regionArray)
+            {
+                if (s.Equals(region, StringComparison.InvariantCultureIgnoreCase))
+                    return s;
+            }
+            foreach (string s in regionArray)
+            {
+                string r = s.Replace(" ", "");
+                if (r.Equals(region, StringComparison.InvariantCultureIgnoreCase))
+                    return s;
+            }
+
+            return "East US 2";
+        }
         public CosmosDBService(
             IConfiguration configuration,
             ILogger<CosmosDBService> logger)

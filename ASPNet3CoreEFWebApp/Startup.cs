@@ -60,7 +60,7 @@ namespace AppService3EFCosmosDB
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Company}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

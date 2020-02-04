@@ -46,7 +46,7 @@
     },
     "repoWebAppPath": {
       "type": "string",
-      "defaultValue": "ASPNetCoreEFWebApp",
+      "defaultValue": "ASPNet3CoreEFWebApp/AppService3EFCosmosDB.csproj",
       "metadata": {
         "description": "The path of the Azure Web App on code on github."
       }
@@ -261,6 +261,10 @@
             {
               "name": "COSMOS_REGION",
               "value": "[resourceGroup().location]"
+            },
+            {
+              "name": "PROJECT",
+              "value": "[parameters('repoWebAppPath')]"
             }
           ]
         }
@@ -273,95 +277,109 @@
       ]
     },
     {
-      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2016-08-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]"
+      ],
+      "location": "[resourceGroup().location]",
+      "name": "[concat(variables('webAppName'), '/web')]",
+      "properties": {
+        "numberOfWorkers": 1,
+        "defaultDocuments": [
+          "Default.htm",
+          "Default.html",
+          "Default.asp",
+          "index.htm",
+          "index.html",
+          "iisstart.htm",
+          "default.aspx",
+          "index.php",
+          "hostingstart.html"
+        ],
+        "netFrameworkVersion": "v4.0",
+        "phpVersion": "",
+        "pythonVersion": "",
+        "nodeVersion": "",
+        "linuxFxVersion": "DOTNETCORE|3.0",
+        "requestTracingEnabled": false,
+        "remoteDebuggingEnabled": false,
+        "remoteDebuggingVersion": "VS2017",
+        "httpLoggingEnabled": false,
+        "logsDirectorySizeLimit": 35,
+        "detailedErrorLoggingEnabled": false,
+        "publishingUsername": "$testdotnetcore3wvd",
+
+        "use32BitWorkerProcess": true,
+        "webSocketsEnabled": false,
+        "alwaysOn": true,
+        "appCommandLine": "",
+        "managedPipelineMode": "Integrated",
+        "virtualApplications": [
+          {
+            "virtualPath": "/",
+            "physicalPath": "site\\wwwroot",
+            "preloadEnabled": true,
+            "virtualDirectories": null
+          }
+        ],
+        "winAuthAdminState": 0,
+        "winAuthTenantState": 0,
+        "customAppPoolIdentityAdminState": false,
+        "customAppPoolIdentityTenantState": false,
+        "loadBalancing": "LeastRequests",
+        "routingRules": [],
+        "experiments": {
+          "rampUpRules": []
+        },
+        "autoHealEnabled": false,
+        "vnetName": "",
+        "siteAuthEnabled": false,
+        "siteAuthSettings": {
+          "enabled": null,
+          "unauthenticatedClientAction": null,
+          "tokenStoreEnabled": null,
+          "allowedExternalRedirectUrls": null,
+          "defaultProvider": null,
+          "clientId": null,
+          "clientSecret": null,
+          "clientSecretCertificateThumbprint": null,
+          "issuer": null,
+          "allowedAudiences": null,
+          "additionalLoginParams": null,
+          "isAadAutoProvisioned": false,
+          "googleClientId": null,
+          "googleClientSecret": null,
+          "googleOAuthScopes": null,
+          "facebookAppId": null,
+          "facebookAppSecret": null,
+          "facebookOAuthScopes": null,
+          "twitterConsumerKey": null,
+          "twitterConsumerSecret": null,
+          "microsoftAccountClientId": null,
+          "microsoftAccountClientSecret": null,
+          "microsoftAccountOAuthScopes": null
+        },
+        "localMySqlEnabled": false,
+        "http20Enabled": false,
+        "minTlsVersion": "1.2",
+        "ftpsState": "AllAllowed",
+        "reservedInstanceCount": 0,
+        "fileChangeAuditEnabled": false
+      },
+      "type": "Microsoft.Web/sites/config"
+    },
+    {
       "apiVersion": "2016-08-01",
       "name": "[concat(variables('webAppName'), '/web')]",
-      "location":  "[resourceGroup().location]",
+      "type": "Microsoft.Web/Sites/sourcecontrols",
       "dependsOn": [
-          "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
+        "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]",
+        "[concat('Microsoft.Web/Sites/', variables('webAppName'),'/config/web')]"
       ],
       "properties": {
-          "numberOfWorkers": 1,
-          "defaultDocuments": [
-              "Default.htm",
-              "Default.html",
-              "Default.asp",
-              "index.htm",
-              "index.html",
-              "iisstart.htm",
-              "default.aspx",
-              "index.php",
-              "hostingstart.html"
-          ],
-          "netFrameworkVersion": "v4.0",
-          "phpVersion": "",
-          "pythonVersion": "",
-          "nodeVersion": "",
-          "linuxFxVersion": "DOTNETCORE|3.1",
-          "requestTracingEnabled": false,
-          "remoteDebuggingEnabled": false,
-          "remoteDebuggingVersion": "VS2017",
-          "httpLoggingEnabled": false,
-          "logsDirectorySizeLimit": 35,
-          "detailedErrorLoggingEnabled": false,
-          "publishingUsername": "$testdotnetcore3wvd",
-         
-          "use32BitWorkerProcess": true,
-          "webSocketsEnabled": false,
-          "alwaysOn": true,
-          "appCommandLine": "",
-          "managedPipelineMode": "Integrated",
-          "virtualApplications": [
-              {
-                  "virtualPath": "/",
-                  "physicalPath": "site\\wwwroot",
-                  "preloadEnabled": true,
-                  "virtualDirectories": null
-              }
-          ],
-          "winAuthAdminState": 0,
-          "winAuthTenantState": 0,
-          "customAppPoolIdentityAdminState": false,
-          "customAppPoolIdentityTenantState": false,
-          "loadBalancing": "LeastRequests",
-          "routingRules": [],
-          "experiments": {
-              "rampUpRules": []
-          },
-          "autoHealEnabled": false,
-          "vnetName": "",
-          "siteAuthEnabled": false,
-          "siteAuthSettings": {
-              "enabled": null,
-              "unauthenticatedClientAction": null,
-              "tokenStoreEnabled": null,
-              "allowedExternalRedirectUrls": null,
-              "defaultProvider": null,
-              "clientId": null,
-              "clientSecret": null,
-              "clientSecretCertificateThumbprint": null,
-              "issuer": null,
-              "allowedAudiences": null,
-              "additionalLoginParams": null,
-              "isAadAutoProvisioned": false,
-              "googleClientId": null,
-              "googleClientSecret": null,
-              "googleOAuthScopes": null,
-              "facebookAppId": null,
-              "facebookAppSecret": null,
-              "facebookOAuthScopes": null,
-              "twitterConsumerKey": null,
-              "twitterConsumerSecret": null,
-              "microsoftAccountClientId": null,
-              "microsoftAccountClientSecret": null,
-              "microsoftAccountOAuthScopes": null
-          },
-          "localMySqlEnabled": false,
-          "http20Enabled": false,
-          "minTlsVersion": "1.2",
-          "ftpsState": "AllAllowed",
-          "reservedInstanceCount": 0,
-          "fileChangeAuditEnabled": false
+        "RepoUrl": "[parameters('repoURL')]",
+        "branch": "[parameters('repoBranch')]",
+        "IsManualIntegration": true
       }
     },
     {
