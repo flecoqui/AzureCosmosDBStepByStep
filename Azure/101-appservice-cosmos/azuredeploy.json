@@ -372,6 +372,7 @@
       "apiVersion": "2016-08-01",
       "name": "[concat(variables('webAppName'), '/web')]",
       "type": "Microsoft.Web/Sites/sourcecontrols",
+      "location": "[resourceGroup().location]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/Sites', variables('webAppName'))]",
         "[concat('Microsoft.Web/Sites/', variables('webAppName'),'/config/web')]"

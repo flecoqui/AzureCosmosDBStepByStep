@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "namePrefix": {
-      "value": "testapp3efcosmos"
+      "value": "app3efcms"
     },
     "webAppSku": {
       "value": "S1"
