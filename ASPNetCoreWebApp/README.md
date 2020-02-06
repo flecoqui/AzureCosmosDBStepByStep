@@ -234,7 +234,7 @@ WithApplicationRegion method:
 
 ```
 
-As the Region Name used by the method WithApplicationRegion contains spaces ('East US 2' instead of 'eastus2', check the Region Name before calling the method.
+As the Region Name used by the method WithApplicationRegion contains spaces ('East US 2' instead of 'eastus2'), check the Region Name before calling the method.
 
 ```csharp
         
