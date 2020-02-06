@@ -197,3 +197,63 @@ Populating database containers if empty:
 
 
 ```
+
+
+### Taking the Azure Region into account for the connection to geo-distributed CosmosDB Services
+If your Cosmos DB service is geo-distributed, it's important to specify the Azure Region of your database client to optimize the latency.
+
+WithApplicationRegion method: 
+
+```csharp
+        
+        public bool InitializeCosmosClient()
+        {
+            bool result = false;
+            try
+            {
+                
+                CosmosClientBuilder clientBuilder = new CosmosClientBuilder(this._cosmosServiceName, this._cosmosServiceKey);
+                this._client = clientBuilder
+                                    .WithConnectionModeDirect()
+                                    .WithApplicationRegion(GetCosmosRegion(this._cosmosRegion))
+                                    .Build();
+                if (this._client != null)
+                {
+                    this._employees = this._client.GetContainer(this._cosmosDatabaseName, _employeesContainerName);
+                    this._companies = this._client.GetContainer(this._cosmosDatabaseName, _companiesContainerName);
+                    result = true;
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Exception while initializing the Cosmos DB Client : ", ex.Message);
+            }
+            return result;
+        }
+
+
+```
+
+As the Region Name used by the method WithApplicationRegion contains spaces ('East US 2' instead of 'eastus2', check the Region Name before calling the method.
+
+```csharp
+        
+        public string GetCosmosRegion(string region)
+        {
+            foreach(string s in regionArray)
+            {
+                if (s.Equals(region, StringComparison.InvariantCultureIgnoreCase))
+                    return s;
+            }
+            foreach (string s in regionArray)
+            {
+                string r = s.Replace(" ", "");
+                if (r.Equals(region, StringComparison.InvariantCultureIgnoreCase))
+                    return s;
+            }
+
+            return "East US 2";
+        }
+
+
+```
